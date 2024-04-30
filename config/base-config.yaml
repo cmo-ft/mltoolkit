@@ -11,7 +11,7 @@ runner_config:
     pre_run_record: ./save/run_record.csv
 
 data_config:
-    dataset_prefix: /lustre/collider/mocen/project/bbtautau/machinelearning/gnn/dataset/hadhad
+    dataset_prefix: /lustre/collider/mocen/project/bbtautau/machinelearning/gnn/dataset/hadhad/dataset
     fold_id: 0
     fold_number: 3
 

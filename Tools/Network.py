@@ -35,7 +35,7 @@ class NetworkWrapper():
         self.model.to(device)
 
     def __call__(self, *args: Any, **kwds: Any):
-        self.model(*args, **kwds)
+        return self.model(*args, **kwds)
 
     @staticmethod
     def initialize_model(model):

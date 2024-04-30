@@ -1,3 +1,4 @@
+#!/lustre/collider/mocen/software/condaenv/hailing/bin/python
 import os
 import yaml
 import random
@@ -31,7 +32,7 @@ def seed_everything(seed):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Run MLToolkit", add_help=False)
-    parser.add_argument("--config", "-c", help = "YAML file for configuration")
+    parser.add_argument("--config_yaml", "-c", required=True, help="YAML file for configuration")
     parser.add_argument("--log-level", "-l", type = str, default = "INFO" )
 
     args = parser.parse_args()

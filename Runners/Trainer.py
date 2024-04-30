@@ -25,8 +25,8 @@ class Trainer(BaseRunner):
             self.network_wrapper.load_model(self.runner_config.get('pre_model_path'))
 
         self.init_epoch_id = 0
-        self.num_epochs = self.config.get('num_epochs')
-        self.lr = self.config.get('learning_rate')
+        self.num_epochs = self.runner_config.get('num_epochs')
+        self.lr = self.runner_config.get('learning_rate')
         self.optimizer = torch.optim.Adam(self.network_wrapper.parameters(), lr=self.lr)
         if self.pretrain:
             self.load_run_record(self.runner_config.get('pre_run_record'))
@@ -41,7 +41,8 @@ class Trainer(BaseRunner):
         idx = deque(range(self.fold_number))
         idx.rotate(self.fold_id)
         idx_dict = {
-            'train': list(idx)[:-2],
+            # 'train': list(idx)[:-2],
+            'train': list(idx)[-3],
             'validation': list(idx)[-2],
             'test': list(idx)[-1],
         }
@@ -58,7 +59,7 @@ class Trainer(BaseRunner):
 
         epoch_start, epoch_end = self.init_epoch_id, self.init_epoch_id+self.num_epochs
         for epoch in range(epoch_start, epoch_end):
-            log.info(f"Epoch: {epoch}/{epoch_end}.")
+            log.info(f"Epoch: {epoch+1}/{epoch_end}.")
             # train one epoch
             log.info(f"Training...")
             start_time = time.time()
@@ -74,7 +75,7 @@ class Trainer(BaseRunner):
                 result.loss.backward()
                 self.optimizer.step()
                 # record result
-                self.run_record = self.do_record(record=self.run_record, epoch=epoch, batch_type='train', batch_id=batch_id, batch_weight=batch.weight.sum(), **result._asdict())
+                self.do_record(epoch=epoch, batch_type='train', batch_id=batch_id, batch_weight=batch.weight.sum(), **result._asdict())
             log.info(f"Complete training with {(time.time()-start_time)/60.:.2f} min.")
             
             # Validate one epoch

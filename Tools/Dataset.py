@@ -1,5 +1,4 @@
 import torch
-from torch.utils.data import Dataset
 import numpy as np
 import pandas as pd
 import torch_geometric
@@ -9,6 +8,7 @@ import copy
 class Dataset(torch_geometric.data.Dataset):
     def __init__(self, data_file):
         # TODO: support a list of index
+        super().__init__()
         self.data_file = data_file
         data = torch.load(data_file)
         self.weight = data.sample_weight.clip(min=0, max=1.)
