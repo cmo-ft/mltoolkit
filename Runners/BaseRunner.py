@@ -70,9 +70,10 @@ class BaseRunner(ABC):
         epoch_result = epoch_result.set_index('batch_type')
         for batch_type in epoch_result.index.unique():
             cur_result = epoch_result.loc[batch_type]
+            cur_weight = cur_result['batch_weight']
             msg = f"Type: {batch_type}. Mean result: "
             for key in self.evaluator.Critria._fields:
-                msg += f"{key}={cur_result[key].sum()/cur_result['batch_weight'].sum():.4f}\t"
+                msg += f"{key}={(cur_result[key]*cur_weight).sum()/cur_weight.sum():.4f}\t"
             log.info(msg=msg)
 
     def apply_model(self, data_loader, epoch=0, batch_type='test'):

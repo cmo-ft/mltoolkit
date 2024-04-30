@@ -21,9 +21,11 @@ class Evaluator():
     def __call__(self, output, truth_label, weight=None):
         if torch.isnan(output).sum():
             log.error(f"Error: nan occured in output: {output}")
-        loss = (self.loss_func(output, truth_label) * (1 if weight is None else weight)).mean()
+        if weight is None:
+            weight = torch.ones(len(output))
+        loss = (self.loss_func(output, truth_label) * weight).sum() / weight.sum()
         prediction = self.manage_output(output=output)
-        accuracy = ((prediction==truth_label) * (1 if weight is None else weight)).mean()
+        accuracy = ((prediction==truth_label) * weight).sum() / weight.sum()
         return self.Critria(loss, accuracy)
     
     """

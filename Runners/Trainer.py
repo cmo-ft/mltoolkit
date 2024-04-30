@@ -54,8 +54,8 @@ class Trainer(BaseRunner):
             self.data_sets[key] = Dataset(f"{self.dataset_prefix}{idx}.pt")
 
     def execute(self):
-        BestEpoch = namedtuple('BestEpoch', ['epoch', 'loss'])
-        self.best_epoch = BestEpoch(0, float('inf'))
+        self.BestEpoch = namedtuple('BestEpoch', ['epoch', 'loss'])
+        self.best_epoch = self.BestEpoch(0, float('inf'))
 
         epoch_start, epoch_end = self.init_epoch_id, self.init_epoch_id+self.num_epochs
         for epoch in range(epoch_start, epoch_end):
@@ -76,26 +76,15 @@ class Trainer(BaseRunner):
                 self.optimizer.step()
                 # record result
                 self.do_record(epoch=epoch, batch_type='train', batch_id=batch_id, batch_weight=batch.weight.sum(), **result._asdict())
-            log.info(f"Complete training with {(time.time()-start_time)/60.:.2f} min.")
+            log.info(f"Complete in {(time.time()-start_time)/60.:.2f} min.")
             
             # Validate one epoch
             log.info(f"Validating...")
             start_time = time.time()
             data_loader = tg_loader.DataLoader(self.data_sets.get('validation'), batch_size=self.batch_size, shuffle=False)
             output_save = self.apply_model(data_loader=data_loader, epoch=epoch, batch_type='validation')
-
-            # save score and record
-            np.save(f"{self.save_dir}/valset_output.npy",arr=output_save.numpy())
-            self.save(record_path=f'{self.save_dir}/run_record.csv', model_path=f'{self.save_dir}/net_{epoch}.pt')
-
-            log.info(f"Complete validation with {(time.time()-start_time)/60.:.2f} min.")
-
-            # Record best epoch
-            cur_epoch_result = self.search_record(self.run_record, epoch=epoch, batch_type='validation')
-            cur_loss = sum(cur_epoch_result.get('loss')) / sum(cur_epoch_result.get('batch_weight'))
-            if cur_loss < self.best_epoch.loss:
-                self.best_epoch = BestEpoch(epoch, cur_loss)
-            self.print_epoch_result(epoch=epoch)
+            self.end_epoch(epoch=epoch, output=output_save)
+            log.info(f"Complete in {(time.time()-start_time)/60.:.2f} min.")
             log.info(f"Total time: {(time.time()-self.time_start)/60.:.2f} min.")
 
         # Test model 
@@ -108,8 +97,25 @@ class Trainer(BaseRunner):
         self.apply_model(data_loader=data_loader, epoch=epoch, batch_type='test')
         # save score and record
         np.save(f"{self.save_dir}/testset_output.npy",arr=output_save.numpy())
-        log.info(f"Complete test with {(time.time()-start_time)/60.:.2f} min.")
+        log.info(f"Complete in {(time.time()-start_time)/60.:.2f} min.")
         self.print_epoch_result(epoch=epoch)
+
+    """
+    Running at the end of each epoch
+    """
+    def end_epoch(self, epoch, output):
+        np.save(f"{self.save_dir}/valset_output.npy",arr=output.numpy())
+        self.save(record_path=f'{self.save_dir}/run_record.csv', model_path=f'{self.save_dir}/net_{epoch}.pt')
+
+        # Record best epoch
+        cur_epoch_result = self.search_record(self.run_record, epoch=epoch, batch_type='validation')
+        loss, weight = np.array(cur_epoch_result.get('loss')), np.array(cur_epoch_result.get('batch_weight'))
+        cur_loss = (loss*weight).sum() / weight.sum()
+        if cur_loss < self.best_epoch.loss:
+            self.best_epoch = self.BestEpoch(epoch, cur_loss)
+        self.print_epoch_result(epoch=epoch)
+        log.info(f'Best epoch: {self.best_epoch.epoch} with loss {self.best_epoch.loss}')
+
 
     def save(self, record_path, model_path):
         record_df = pd.DataFrame(self.run_record)

@@ -12,7 +12,7 @@ class Dataset(torch_geometric.data.Dataset):
         self.data_file = data_file
         data = torch.load(data_file)
         self.weight = data.sample_weight.clip(min=0, max=1.)
-        # self.weight = self.weight.abs() * (data.y*1e3 + 1)
+        self.weight = self.weight.abs() * (data.y*1e3 + 1)
         self._data = data
 
     def len(self) -> int:
