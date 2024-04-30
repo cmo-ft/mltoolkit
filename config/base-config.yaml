@@ -1,0 +1,40 @@
+# can be Train or Test
+runner_type: Train 
+random_seed: 42
+batch_size: 1024
+save_dir: ./save/
+runner_config:
+    num_epochs: 25
+    learning_rate: 0.008
+    pretrain: False
+    pre_model_path: ./save/net.pt # functions only when pretrain is True
+    pre_run_record: ./save/run_record.csv
+
+data_config:
+    dataset_prefix: /lustre/collider/mocen/project/bbtautau/machinelearning/gnn/dataset/hadhad
+    fold_id: 0
+    fold_number: 3
+
+evaluator_config:
+    loss_function: CrossEntropyLoss
+
+network_config:
+    Network: AttentionNet
+    model_setting:
+        block_params: [
+                # out_channels, heads, dim_linear_block, dropout
+                [16, 4, 64, 0.2],
+                [32, 4, 128, 0.2],
+                [64, 4, 256, 0.2],
+                [32, 4, 128, 0.2],
+                [16, 4, 64, 0.2],
+        ]
+        fc_params: [
+            [0.1, 8],
+            [0.1, 4],
+        ]
+        dim_embedding: 32
+        global_features: 7
+        edge_features: 3
+        input_features: 8
+        output_classes: 2
