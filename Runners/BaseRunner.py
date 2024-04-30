@@ -88,7 +88,7 @@ class BaseRunner(ABC):
                 # record result
                 self.do_record(epoch=epoch, batch_type=batch_type, batch_id=batch_id, batch_weight=batch.weight.sum(), **result._asdict())
                 output_save.append(torch.cat([batch.weight.view(-1,1), truth_label.view(-1, 1), output ], 1).detach().cpu())
-        return torch.cat(output_save)
+        return torch.cat(output_save).numpy()
 
     @abstractmethod
     def execute(self):

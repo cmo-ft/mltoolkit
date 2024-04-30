@@ -15,6 +15,9 @@ log = logging.getLogger(__name__)
 class Trainer(BaseRunner):
     def __init__(self, config):
         super().__init__(config)
+        self.reduce_schedule = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, mode='min', factor=0.5, patience=8,
+                 verbose=False, threshold=0.1, threshold_mode='rel',
+                 cooldown=0, min_lr=1e-8, eps=1e-8)
 
     def load(self):
         super().load()
@@ -60,7 +63,7 @@ class Trainer(BaseRunner):
 
         epoch_start, epoch_end = self.init_epoch_id, self.init_epoch_id+self.num_epochs
         for epoch in range(epoch_start, epoch_end):
-            log.info(f"Epoch: {epoch}/{epoch_end-1}.")
+            log.info(f"Epoch: {epoch}/{epoch_end-1}. Learning rate: {self.optimizer.param_groups[0]['lr']}")
             # train one epoch
             log.info(f"Training...")
             start_time = time.time()
@@ -87,18 +90,20 @@ class Trainer(BaseRunner):
             self.end_epoch(epoch=epoch, output=output_save)
             log.info(f"Complete in {(time.time()-start_time)/60.:.2f} min.")
             log.info(f"Total time: {(time.time()-self.time_start)/60.:.2f} min.")
-            log.info('\n\n\n')
+            print('\n\n')
 
         # Test model 
         start_time = time.time()
         # get best epoch
         epoch = self.best_epoch.epoch
         log.info(f"Testing model in epoch {epoch}...")
-        self.network_wrapper.load_model(f'{self.save_dir}/net_{epoch}.pt')
+        self.network_wrapper.load_model(f'{self.save_dir}/net.pt')
         data_loader = tg_loader.DataLoader(self.data_sets.get('test'), batch_size=self.batch_size, shuffle=False)
-        self.apply_model(data_loader=data_loader, epoch=epoch, batch_type='test')
+        output_save = self.apply_model(data_loader=data_loader, epoch=epoch, batch_type='test')
         # save score and record
-        np.save(f"{self.save_dir}/testset_output.npy",arr=output_save.numpy())
+        np.save(f"{self.save_dir}/testset_output.npy",arr=output_save)
+        self.plot_loss()
+        self.plot_score(output=output_save)
         log.info(f"Complete in {(time.time()-start_time)/60.:.2f} min.")
         self.print_epoch_result(epoch=epoch)
 
@@ -106,9 +111,8 @@ class Trainer(BaseRunner):
     Running at the end of each epoch
     """
     def end_epoch(self, epoch, output):
-        output = output.numpy()
         np.save(f"{self.save_dir}/valset_output.npy",arr=output)
-        self.save(record_path=f'{self.save_dir}/run_record.csv', model_path=f'{self.save_dir}/net_{epoch}.pt')
+        self.save(record_path=f'{self.save_dir}/run_record.csv', model_path=f'{self.save_dir}/net{epoch}.pt')
         self.plot_loss()
         self.plot_score(output=output)
 
@@ -116,8 +120,10 @@ class Trainer(BaseRunner):
         cur_epoch_result = self.search_record(self.run_record, epoch=epoch, batch_type='validation')
         loss, weight = np.array(cur_epoch_result.get('loss')), np.array(cur_epoch_result.get('batch_weight'))
         cur_loss = (loss*weight).sum() / weight.sum()
+        self.reduce_schedule.step(cur_loss)
         if cur_loss < self.best_epoch.loss:
             self.best_epoch = self.BestEpoch(epoch, cur_loss)
+            self.network_wrapper.save_model(f'{self.save_dir}/net.pt')
         self.print_epoch_result(epoch=epoch)
         log.info(f'Best epoch: {self.best_epoch.epoch} with loss {self.best_epoch.loss}')
 
@@ -157,7 +163,8 @@ class Trainer(BaseRunner):
         bins = 50
         plot.ax.hist(score[signal_mask], bins=bins, weights=weight[signal_mask], label='Signal', color='red', histtype='step', linewidth=2)
         plot.ax.hist(score[~signal_mask], bins=bins, weights=weight[~signal_mask], label='Background', color='blue', histtype='step', linewidth=2)
-        plot.apply_settings(if_legend=True)
+        plot.apply_settings()
+        plot.ax.legend(loc='upper center')
         plot.savefig()
 
         # Plot ROC
