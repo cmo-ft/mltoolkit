@@ -13,7 +13,7 @@ class Dataset(torch_geometric.data.Dataset):
         self.signal_scale_factor = signal_scale_factor
         data = torch.load(data_file)
         weight = data.sample_weight
-        weight = weight.clip(min=0, max=1.)
+        weight = weight.clip(min=1e-5, max=1.)
         weight = weight.abs() * (data.y*signal_scale_factor + 1)
         self.weight = weight
         self._data = data
