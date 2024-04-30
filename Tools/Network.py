@@ -18,7 +18,7 @@ class NetworkWrapper():
 
         # Initialize Network
         if self.pre_model_path is None:
-            self.initialize_model(model=self.model)
+            self.model = self.initialize_model(model=self.model)
         else:
             self.load_model(self.pre_model_path)
 
@@ -36,6 +36,9 @@ class NetworkWrapper():
     
     def eval(self):
         self.model.eval()
+
+    def train(self):
+        self.model.train()
 
     def __call__(self, *args: Any, **kwds: Any):
         return self.model(*args, **kwds)

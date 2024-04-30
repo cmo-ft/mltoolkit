@@ -67,6 +67,7 @@ class Trainer(BaseRunner):
             # train one epoch
             log.info(f"Training...")
             start_time = time.time()
+            self.network_wrapper.train()
             data_loader = tg_loader.DataLoader(self.data_sets.get('train'), batch_size=self.batch_size, shuffle=True)
             for batch_id, batch in enumerate(data_loader, 0):
                 # clear the gradients of all optimized variables
@@ -177,3 +178,4 @@ class Trainer(BaseRunner):
         plot.ax.legend(loc='lower right')
         plot.apply_settings()
         plot.savefig()
+        utils.plt.cla()
