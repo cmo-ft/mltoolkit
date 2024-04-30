@@ -33,6 +33,9 @@ class NetworkWrapper():
     
     def to(self, device):
         self.model.to(device)
+    
+    def eval(self):
+        self.model.eval()
 
     def __call__(self, *args: Any, **kwds: Any):
         return self.model(*args, **kwds)

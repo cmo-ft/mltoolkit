@@ -78,6 +78,7 @@ class BaseRunner(ABC):
 
     def apply_model(self, data_loader, epoch=0, batch_type='test'):
         output_save = []
+        self.network_wrapper.eval()
         with torch.no_grad():
             for batch_id, batch in enumerate(data_loader, 0):
                 # Model output
