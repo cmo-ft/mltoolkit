@@ -40,6 +40,7 @@ class Trainer(BaseRunner):
         self.data_config = self.config.get('data_config')
         self.dataset_prefix = self.data_config.get('dataset_prefix')
         self.fold_id, self.fold_number = self.data_config.get('fold_id'), self.data_config.get('fold_number')
+        self.signal_scale_factor=float(self.data_config.get('signal_scale_factor'))
 
         # Get train / validation / test id
         idx = deque(range(self.fold_number))
@@ -55,7 +56,7 @@ class Trainer(BaseRunner):
         self.data_sets = {}
         for key, idx in idx_dict.items():
             # TODO: support a list of index
-            self.data_sets[key] = Dataset(f"{self.dataset_prefix}{idx}.pt")
+            self.data_sets[key] = Dataset(f"{self.dataset_prefix}{idx}.pt", signal_scale_factor=self.signal_scale_factor)
 
     def execute(self):
         self.BestEpoch = namedtuple('BestEpoch', ['epoch', 'loss'])
@@ -162,7 +163,7 @@ class Trainer(BaseRunner):
         # Plot scores
         plot = utils.PlotContainer(xlabel='Score', ylabel='A.U.', figname=f'{self.save_dir}/scores.pdf')
         bins = 50
-        plot.ax.hist(score[signal_mask], bins=bins, weights=weight[signal_mask], label='Signal', color='red', histtype='step', linewidth=2)
+        plot.ax.hist(score[signal_mask], bins=bins, weights=weight[signal_mask], label=rf'Signal$\times${self.signal_scale_factor:.0f}', color='red', histtype='step', linewidth=2)
         plot.ax.hist(score[~signal_mask], bins=bins, weights=weight[~signal_mask], label='Background', color='blue', histtype='step', linewidth=2)
         plot.apply_settings()
         plot.ax.legend(loc='upper center')

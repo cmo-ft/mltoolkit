@@ -6,13 +6,16 @@ from torch_geometric.data import Data
 import copy
 
 class Dataset(torch_geometric.data.Dataset):
-    def __init__(self, data_file):
+    def __init__(self, data_file, signal_scale_factor=1e3):
         # TODO: support a list of index
         super().__init__()
         self.data_file = data_file
+        self.signal_scale_factor = signal_scale_factor
         data = torch.load(data_file)
-        self.weight = data.sample_weight.clip(min=0, max=1.)
-        self.weight = self.weight.abs() * (data.y*1e3 + 1)
+        weight = data.sample_weight
+        weight = weight.clip(min=0, max=1.)
+        weight = weight.abs() * (data.y*signal_scale_factor + 1)
+        self.weight = weight
         self._data = data
 
     def len(self) -> int:
