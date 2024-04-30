@@ -31,10 +31,5 @@ class Dataset(torch_geometric.data.Dataset):
         data = self._data[idx].clone()
         data.weight = self.weight[idx]
         data.u = torch.where(torch.isnan(data.u), torch.full_like(data.u, 0), data.u) # clean up Nan
-        # data.u *= 1e-10 
-        # data.x[:2] *= 1e-10
-        # data.x = data.x.type(torch.float)
-        # data.edge_index = data.edge_index.type(torch.long)
-        # data.edge_attr = data.edge_attr * 0.
         self._data_list[idx] = data
         return copy.copy(self._data_list[idx])
