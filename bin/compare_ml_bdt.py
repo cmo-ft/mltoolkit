@@ -92,14 +92,16 @@ class Analyzer():
         myplot.savefig()
 
 
-def compare_single_fold(config):
+def compare_single_fold(config, signal_sf=None):
     # get graph path
     testset_id = get_testset_id(config.get('data_config').get('fold_id'), config.get('data_config').get('num_folds'))
     graph_path = config.get('data_config').get('dataset_prefix') + f"{testset_id}.pt"
 
     # get ml result path
     ml_result_path = config.get('save_dir') + '/testset_output.npy'
-    analyzer = Analyzer(graph_path=graph_path, ml_result_path=ml_result_path, signal_sf=float(config.get('data_config').get('signal_scale_factor')))
+
+    signal_sf = float(config.get('data_config').get('signal_scale_factor')) if signal_sf is None else signal_sf
+    analyzer = Analyzer(graph_path=graph_path, ml_result_path=ml_result_path, signal_sf=signal_sf)
 
     # do analyze
     analyzer.analyze(save_ratio_plot=config.get('save_dir') + "/compare_score.pdf")
@@ -108,6 +110,7 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Compre ML and BDT score", add_help=False)
     parser.add_argument("--config_yaml", "-c", default='./config.yaml', help="YAML file for configuration")
+    parser.add_argument("--signal_sf", "-sf", type = float, default=None, help="Specify scale factors")
     parser.add_argument("--log-level", "-l", type = str, default = "INFO" )
 
     args = parser.parse_args()
@@ -117,7 +120,7 @@ if __name__ == "__main__":
     logging.basicConfig(level = loglevel, format = ">>> [%(levelname)s] %(module).s%(name)s: %(message)s")
     log = logging.getLogger("Compare ML and BDT")
 
-    config = read_yaml(args.config_yaml)
+    config = read_yaml(args.config_yaml, signal_sf=args.signal_sf)
 
     compare_single_fold(config=config)
 
