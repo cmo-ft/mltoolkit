@@ -39,11 +39,11 @@ class Trainer(BaseRunner):
         from collections import deque
         self.data_config = self.config.get('data_config')
         self.dataset_prefix = self.data_config.get('dataset_prefix')
-        self.fold_id, self.fold_number = self.data_config.get('fold_id'), self.data_config.get('fold_number')
+        self.fold_id, self.num_folds = self.data_config.get('fold_id'), self.data_config.get('num_folds')
         self.signal_scale_factor=float(self.data_config.get('signal_scale_factor'))
 
         # Get train / validation / test id
-        idx = deque(range(self.fold_number))
+        idx = deque(range(self.num_folds))
         idx.rotate(self.fold_id)
         idx_dict = {
             # 'train': list(idx)[:-2],

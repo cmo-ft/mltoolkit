@@ -13,7 +13,7 @@ runner_config:
 data_config:
     dataset_prefix: /lustre/collider/mocen/project/bbtautau/machinelearning/traindir/hadhad/ggF_low/dataset
     fold_id: 0
-    fold_number: 3
+    num_folds: 3
     signal_scale_factor: 1e3
 
 evaluator_config:
