@@ -55,7 +55,9 @@ def get_graph_setting(channel, SR):
         node_features, edges, edge_features = get_node_edge_features(common_node_feature_format,common_edge_feature_format, hadhad_pars.keys())
         if SR=='ggF_high':
             glob_features = [
-                "num_jets", "T1", "mTtau1", "spher_bbtt", "pflow_bbtt", "cent_bbtt", "met_NOSYS_sumet"
+                "num_jets", "T1", "mTtau1", "spher_bbtt", 
+                # "pflow_bbtt",  # currently value of this var is all 0. Remove it.
+                "cent_bbtt", "met_NOSYS_sumet"
             ]
             tree_name = 'tree_2tag_OS_LL_GGFSR_350mHH'
         elif SR=='ggF_low':
