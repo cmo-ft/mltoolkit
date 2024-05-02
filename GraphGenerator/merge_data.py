@@ -40,7 +40,7 @@ for c in channels:
         print(f"Mergin channel {c} SR {sr}...")
         graph_path = os.path.dirname(out_path_format.format(channel=c, sr=sr, sample_name=""))
         source_graphs = glob.glob(graph_path + '/*.pt')
-        dest_data_format = graph_path + '/../dataset{ifold}'
+        dest_data_format = graph_path + '/../dataset{ifold}.pt'
 
         # get source graph
         source = data_source(source_graphs, nfold=nfold)
