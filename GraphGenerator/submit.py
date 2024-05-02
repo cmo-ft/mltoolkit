@@ -4,6 +4,7 @@ import itertools
 import time
 import shutil
 import glob
+from configs import data_path_format, out_path_format, ignore_files
 
 max_materialize = 495
 
@@ -55,8 +56,6 @@ sub_job = htcondor.Submit({
         "getenv": 'True',
 })
 
-data_path_format = '/lustre/collider/mocen/project/bbtautau/hhard/lxplus-sync/sample_{channel}/*.root'
-out_path_format = '/lustre/collider/mocen/project/bbtautau/machinelearning/traindir/{channel}/{sr}/split/{sample_name}.pt'
 channels = [
     'hadhad',
     # 'lephadSLT'
@@ -71,6 +70,9 @@ itemdata = []
 for channel in channels:
     in_files = glob.glob(data_path_format.format(channel=channel))
     for f in in_files:
+        # ignore several files
+        if any([ig_f in f for ig_f in ignore_files]):
+            continue
         sample_name = os.path.basename(f).split('.')[0]
         itemdata += [
             {'cur': f'{sample_name}', 'job_tag': f'gen_dataset_{channel}_{sr}', 'in_file': f, 

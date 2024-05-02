@@ -2,6 +2,11 @@ import math
 import torch
 from collections import namedtuple
 
+data_path_format = '/lustre/collider/mocen/project/bbtautau/hhard/lxplus-sync/sample_{channel}/*.root'
+out_path_format = '/lustre/collider/mocen/project/bbtautau/machinelearning/traindir/{channel}/{sr}/split/{sample_name}.pt'
+# not use data/hhttbbL10/hhttbbVBFNONSM
+ignore_files = ['data.root', 'hhttbbL10.root', 'hhttbbVBFNONSM.root']
+
 ParticleProperty = namedtuple("ParticleProperty", ["Importance", "Loc"])
 GraphSetting = namedtuple(
     'GraphSetting',
