@@ -1,0 +1,6 @@
+channel: hadhad
+ntuple_path: ./hadhad_ntuples/
+SRs: [
+	ggF_high,
+]
+
