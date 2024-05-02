@@ -99,7 +99,7 @@ class Trainer(BaseRunner):
         # get best epoch
         epoch = self.best_epoch.epoch
         log.info(f"Testing model in epoch {epoch}...")
-        self.network_wrapper.load_model(f'{self.save_dir}/net.pt')
+        self.network_wrapper.load_model(f'{self.save_dir}/model.pt')
         data_loader = tg_loader.DataLoader(self.data_sets.get('test'), batch_size=self.batch_size, shuffle=False)
         output_save = self.apply_model(data_loader=data_loader, epoch=epoch, batch_type='test')
         # save score and record
@@ -114,7 +114,7 @@ class Trainer(BaseRunner):
     """
     def end_epoch(self, epoch, output):
         np.save(f"{self.save_dir}/valset_output.npy",arr=output)
-        self.save(record_path=f'{self.save_dir}/run_record.csv', model_path=f'{self.save_dir}/net{epoch}.pt')
+        self.save(record_path=f'{self.save_dir}/run_record.csv', model_path=f'{self.save_dir}/models/model{epoch}.pt')
         self.plot_loss()
         self.plot_score(output=output)
 
@@ -125,7 +125,7 @@ class Trainer(BaseRunner):
         self.reduce_schedule.step(cur_loss)
         if cur_loss < self.best_epoch.loss:
             self.best_epoch = self.BestEpoch(epoch, cur_loss)
-            self.network_wrapper.save_model(f'{self.save_dir}/net.pt')
+            self.network_wrapper.save_model(f'{self.save_dir}/model.pt')
         self.print_epoch_result(epoch=epoch)
         log.info(f'Best epoch: {self.best_epoch.epoch} with loss {self.best_epoch.loss}')
 
@@ -136,7 +136,7 @@ class Trainer(BaseRunner):
         self.network_wrapper.save_model(model_path)
 
     def finish(self):
-        self.save(record_path=f'{self.save_dir}/run_record.csv', model_path=f'{self.save_dir}/net.pt')
+        self.save(record_path=f'{self.save_dir}/run_record.csv', model_path=f'{self.save_dir}/model.pt')
     
     def plot_loss(self):
         result = pd.DataFrame(self.run_record)

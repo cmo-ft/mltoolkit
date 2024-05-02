@@ -14,7 +14,7 @@ class BaseRunner(ABC):
         self.time_start = time.time()
         self.config = config
         self.load()
-        os.makedirs(self.save_dir, exist_ok=True)
+        os.makedirs(self.save_dir + '/models/', exist_ok=True)
 
     @abstractmethod
     def load(self):
