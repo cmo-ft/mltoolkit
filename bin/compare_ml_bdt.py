@@ -120,9 +120,9 @@ if __name__ == "__main__":
     logging.basicConfig(level = loglevel, format = ">>> [%(levelname)s] %(module).s%(name)s: %(message)s")
     log = logging.getLogger("Compare ML and BDT")
 
-    config = read_yaml(args.config_yaml, signal_sf=args.signal_sf)
+    config = read_yaml(args.config_yaml)
 
-    compare_single_fold(config=config)
+    compare_single_fold(config=config, signal_sf=args.signal_sf)
 
     log.info("Done")
     os._exit(0)
