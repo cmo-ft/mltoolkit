@@ -51,6 +51,9 @@ class Analyzer():
             self.bdt_score = np.concatenate([self.bdt_score, cur_bdt_score])
         
     def analyze(self, save_ratio_plot='./compare_score.pdf'):
+        signal_mask = (self.truth==1)
+        yields_sig, yields_bkg = self.weight[signal_mask].sum()/self.signal_sf, self.weight[~signal_mask].sum()
+        log.info(msg=f"Background yields: {yields_bkg:.4f}, signal yields: {yields_sig:.4f}, ratio: {yields_bkg/yields_sig:.1f}")
         # rescale ml score to be [-1, 1]
         self.ml_score = (2 * self.ml_score - self.ml_score.max() - self.ml_score.min()) / (self.ml_score.max() - self.ml_score.min())
 
@@ -61,7 +64,6 @@ class Analyzer():
 
         # load scores
         auc_bdt_gnn = [0, 0]
-        signal_mask = (self.truth==1)
         for i, name, score, linestyle in zip(
                             list(range(2)),
                             ['BDT', 'GNN'], 
