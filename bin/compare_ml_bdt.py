@@ -3,6 +3,7 @@ import os
 import yaml
 import numpy as np
 from scipy.special import softmax
+from sklearn.metrics import roc_curve
 import torch
 from utils.utils import RatioPlotContainer
 
@@ -59,6 +60,7 @@ class Analyzer():
         x_values = (bins[1:] + bins[:-1])/2
 
         # load scores
+        auc_bdt_gnn = [0, 0]
         signal_mask = (self.truth==1)
         for i, name, score, linestyle in zip(
                             list(range(2)),
@@ -66,6 +68,9 @@ class Analyzer():
                             [self.bdt_score, self.ml_score],
                             ['dashed', None]
                             ):
+            # get auc
+            fpr, tpr, _ = roc_curve(self.truth, score, sample_weight=self.weight)
+            auc_bdt_gnn[i] = np.trapz(tpr, fpr)
             # plot signal
             s, w = score[signal_mask], self.weight[signal_mask]
             hist, bins, _ = myplot.ax.hist(s, bins=bins, weights=w, label=fr'{name} Signal$\times$ {self.signal_sf:.0f}',  histtype='step', linewidth=2, color='red', linestyle=linestyle)
@@ -79,8 +84,9 @@ class Analyzer():
     
         myplot.draw_ratio(draw_error=False, ratio_ylabel='GNN/BDT')
         myplot.apply_settings()
-        myplot.ax.legend(loc='upper center', fontsize=9)
-        myplot.ax_ratio.set_ylim([0, 8])
+        myplot.ax.legend(title=f"BDT AUC: {auc_bdt_gnn[0]:.3f}\nGNN AUC: {auc_bdt_gnn[1]:.3f}", 
+                loc='upper center', fontsize=9, title_fontsize=9)
+        myplot.ax_ratio.set_ylim([0, 5])
         myplot.savefig()
 
 
