@@ -14,7 +14,7 @@ data_config:
     dataset_prefix: /lustre/collider/mocen/project/bbtautau/machinelearning/traindir/hadhad/vbf/dataset
     fold_id: 0
     num_folds: 3
-    signal_scale_factor: 1e3
+    signal_scale_factor: 4e3
 
 evaluator_config:
     loss_function: CrossEntropyLoss

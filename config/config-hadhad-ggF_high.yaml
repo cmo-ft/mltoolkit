@@ -14,7 +14,7 @@ data_config:
     dataset_prefix: /lustre/collider/mocen/project/bbtautau/machinelearning/traindir/hadhad/ggF_high/dataset
     fold_id: 0
     num_folds: 3
-    signal_scale_factor: 1e3
+    signal_scale_factor: 800
 
 evaluator_config:
     loss_function: CrossEntropyLoss
@@ -26,7 +26,6 @@ network_config:
                 # out_channels, heads, dim_linear_block, dropout
                 [16, 4, 64, 0.2],
                 [32, 4, 128, 0.2],
-                [64, 4, 256, 0.2],
                 [32, 4, 128, 0.2],
                 [16, 4, 64, 0.2],
         ]
