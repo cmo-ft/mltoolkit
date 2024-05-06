@@ -1,5 +1,5 @@
 #!/bin/bash
-python -m pip install --user htcondor 
+# python -m pip install --user htcondor 
 
 BASEDIR=$(dirname "$BASH_SOURCE")
 BASEDIR=$(realpath $BASEDIR)
