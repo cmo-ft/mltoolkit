@@ -9,6 +9,16 @@ import torch
 GraphDataFormat = namedtuple("GraphDataFormat", ["truth_label", "node_features", "edge_features", "global_features", "weight_original", "weight_train", "misc_features"])
 
 class BaseDataset(ABC, torch_geometric.data.Dataset):
+    """
+    Base class for creating custom datasets in PyTorch Geometric.
+
+    Args:
+        ntuple_path_list (list[str]): List of paths to the input ntuple files.
+        path_save_graphs (str, optional): Path to save the preprocessed graph data. If provided,
+            the graph data will be loaded from this path if it exists, otherwise it will be generated
+            and saved to this path. Defaults to None.
+    """
+
     def __init__(self, ntuple_path_list, path_save_graphs=None):
         self.ntuple_path_list = ntuple_path_list
         self.graph_list = []
@@ -20,6 +30,15 @@ class BaseDataset(ABC, torch_geometric.data.Dataset):
             self.graph_list = torch.load(path_save_graphs)
 
     def load(self):
+        """
+        Loads the input data and generates the graph data.
+
+        This method is called during initialization to load the input data from the ntuple files
+        and generate the graph data for each entry.
+
+        Raises:
+            FileNotFoundError: If the ntuple file specified in `ntuple_path_list` does not exist.
+        """
         self.tree_name, self.branch_names = self.get_tree_name(), self.get_branch_names()
         for ntuple_path in self.ntuple_path_list:
             tree = ur.open(ntuple_path)[self.tree_name]
