@@ -16,12 +16,12 @@ class Trainer(BaseRunner):
     def __init__(self, config):
         super().__init__(config)
         self.reduce_schedule = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, mode='min', factor=0.5, patience=8,
-                 verbose=False, threshold=0.1, threshold_mode='rel',
-                 cooldown=0, min_lr=1e-8, eps=1e-8)
+                verbose=False, threshold=0.1, threshold_mode='rel',
+                cooldown=0, min_lr=1e-8, eps=1e-8)
 
     def load(self):
         super().load()
-        torchinfo.summary(self.network_wrapper.model)
+        print(torchinfo.summary(self.network_wrapper.model))
 
         # If pretrain, then load pretrained model
         self.pretrain = self.runner_config.get('pretrain')
