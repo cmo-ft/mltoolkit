@@ -12,17 +12,51 @@ from Networks.NetworkInterface import NetworkInterface
 log = logging.getLogger(__name__)
 
 class BaseRunner(ABC, Recorder):
+    """
+    Base class for runners in the ML toolkit.
+
+    Args:
+        config (dict): Configuration parameters for the runner.
+
+    Attributes:
+        dataset (DatasetInterface): Interface for handling datasets.
+        metric (MetricInterface): Interface for handling metrics.
+        network (NetworkInterface): Interface for handling networks.
+        optimizer (torch.optim.Optimizer): Optimizer for training the network.
+
+    Methods:
+        load(): Load the dataset, metric, and network interfaces.
+        apply_model(data_loader, epoch=0, batch_type='test'): Apply the trained model on the given data loader.
+        train_model(data_loader, epoch): Train the model using the given data loader.
+        execute(): Abstract method to execute the runner.
+        finish(): Abstract method to finish the runner.
+    """
+
     def __init__(self, config):
         self.config = config
         self.load()
 
     def load(self):
+        """
+        Load the dataset, metric, and network interfaces.
+        """
         self.dataset = DatasetInterface(self.config.get('data_config'))
-        metric = MetricInterface(self.config.get('metric_config'))
-        network = NetworkInterface(self.config.get('network_config'))
-        super(Recorder, self).__init__(self.config, metric, network)
+        self.metric = MetricInterface(self.config.get('metric_config'))
+        self.network = NetworkInterface(self.config.get('network_config'))
+        super(Recorder, self).__init__(self.config, self.metric, self.network)
 
     def apply_model(self, data_loader, epoch=0, batch_type='test'):
+        """
+        Apply the trained model on the given data loader.
+
+        Args:
+            data_loader (torch.utils.data.DataLoader): Data loader for the input data.
+            epoch (int): Current epoch number (default: 0).
+            batch_type (str): Type of batch (default: 'test').
+
+        Returns:
+            tuple: A tuple containing the output, truth labels, and weights.
+        """
         output_save, truth_label_save, weight_save = [], [], []
         output_save = []
         self.network.eval()
@@ -41,6 +75,13 @@ class BaseRunner(ABC, Recorder):
         return torch.cat(output_save), torch.cat(truth_label_save), torch.cat(weight_save)
     
     def train_model(self, data_loader, epoch):
+        """
+        Train the model using the given data loader.
+
+        Args:
+            data_loader (torch.utils.data.DataLoader): Data loader for the training data.
+            epoch (int): Current epoch number.
+        """
         if not hasattr(self, "optimizer"):
             log.info("No optimizer found, create a new one.")
             self.optimizer = torch.optim.Adam(self.network.parameters(), lr=self.config.get('learning_rate'))
@@ -62,8 +103,14 @@ class BaseRunner(ABC, Recorder):
 
     @abstractmethod
     def execute(self):
+        """
+        Abstract method to execute the runner.
+        """
         ...
 
     @abstractmethod
     def finish(self):
+        """
+        Abstract method to finish the runner.
+        """
         ...
