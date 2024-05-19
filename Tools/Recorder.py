@@ -4,6 +4,7 @@ import logging
 import torch
 import numpy as np
 import pandas as pd
+import torchinfo
 from utils import utils
 from Metrics.MetricInterface import MetricInterface
 from Metrics.BaseMetric import BaseMetric
@@ -26,6 +27,8 @@ class Recorder:
         self.record_path = self.save_dir + '/record.csv'
         os.makedirs(self.save_dir + '/models/', exist_ok=True)
 
+        network_info = torchinfo.summary(self.network.model).__repr__()
+        log.info(f"Network info: {network_info}")
         pre_trained = self.config.get("pre_trained")
         if pre_trained:
             self.network.load_model(pre_trained)
