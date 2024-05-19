@@ -47,15 +47,6 @@ class DatasetInterface():
         data_class_name = self.data_config.get('dataclass').split('.') # e.g. 'HadHadDataset.HadHadGGFHighDataset'
         self._dataclass = getattr(import_module(".".join(['Datasets'] + data_class_name[:-1])), data_class_name[-1])
 
-        train_set = []
-        for idx in self.idx_dict['train']:
-            train_set += self._dataclass(self.ntuple_path_list, idx, self.total_folds, self.path_save_graphs).graph_list
-        self.dataloader_dict = {
-            'train': torch_geometric.loader.DataLoader(train_set, batch_size=self.batch_size, shuffle=True),
-            'validation': torch_geometric.loader.DataLoader(self._dataclass(self.ntuple_path_list, self.idx_dict['validation'], self.total_folds, self.path_save_graphs).graph_list, batch_size=self.batch_size, shuffle=False),
-            'test': torch_geometric.loader.DataLoader(self._dataclass(self.ntuple_path_list, self.idx_dict['test'], self.total_folds, self.path_save_graphs).graph_list, batch_size=self.batch_size, shuffle=False),
-        }
-
     def manipulate_folds(self)->None:
         """
         Manipulates the folds for training, validation, and testing.
@@ -84,4 +75,12 @@ class DatasetInterface():
             torch_geometric.loader.DataLoader: The dataloader for the specified key.
 
         """
+        if key not in self.dataloader_dict:
+            if key=='train':
+                for idx in self.idx_dict['train']:
+                    train_set += self._dataclass(self.ntuple_path_list, idx, self.total_folds, self.path_save_graphs).graph_list
+                self.dataloader_dict[key] = torch_geometric.loader.DataLoader(train_set, batch_size=self.batch_size, shuffle=True)
+            else:
+                self.dataloader_dict[key] = torch_geometric.loader.DataLoader(self._dataclass(self.ntuple_path_list, self.idx_dict[key], self.total_folds, self.path_save_graphs).graph_list, batch_size=self.batch_size, shuffle=False)
+        
         return self.dataloader_dict[key]
