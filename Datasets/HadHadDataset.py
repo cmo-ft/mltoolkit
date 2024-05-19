@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from Datasets.BaseDataset import BaseDataset, GraphDataFormat
 
-class HadHadDataset(BaseDataset):
+class HadHadGGFHighDataset(BaseDataset):
     def __init__(self, ntuple_path_list: list[str], fold_id: int, total_folds: int=3, path_save_graphs: int=None):
         super().__init__(ntuple_path_list, path_save_graphs)
         self.fold_id = fold_id

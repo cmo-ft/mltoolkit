@@ -19,7 +19,7 @@ class DatasetInterface():
         dataloader_dict (dict): A dictionary containing the dataloaders for different sets.
 
     Methods:
-        load(): Loads the dataset.
+        setup(): Loads the dataset.
         manipulate_folds(): Manipulates the folds for training, validation, and testing.
         get_dataloader(key): Returns the dataloader for the specified key.
 
@@ -28,9 +28,9 @@ class DatasetInterface():
     def __init__(self, data_config):
         super().__init__()
         self.data_config = data_config
-        self.load()
+        self.setup()
     
-    def load(self)->None:
+    def setup(self)->None:
         """
         Loads the dataset.
 
@@ -44,8 +44,8 @@ class DatasetInterface():
         self.ntuple_path_list = self.data_config.get('ntuple_path_list')
         self.path_save_graphs = self.data_config.get('path_save_graphs')
 
-        data_class_name = self.data_config.get('dataclass').split('.') # e.g. 'Datasets.HadHadDataset.HadHadDataset'
-        self._dataclass = getattr(import_module(".".join(data_class_name[:-1])), data_class_name[-1])
+        data_class_name = self.data_config.get('dataclass').split('.') # e.g. 'HadHadDataset.HadHadGGFHighDataset'
+        self._dataclass = getattr(import_module(".".join(['Datasets'] + data_class_name[:-1])), data_class_name[-1])
 
         train_set = []
         for idx in self.idx_dict['train']:
