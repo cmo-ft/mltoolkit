@@ -11,7 +11,7 @@ from Networks.NetworkInterface import NetworkInterface
 
 log = logging.getLogger(__name__)
 
-class BaseRunner(ABC, Recorder):
+class BaseRunner(Recorder):
     """
     Base class for runners in the ML toolkit.
 
@@ -43,7 +43,7 @@ class BaseRunner(ABC, Recorder):
         self.dataset = DatasetInterface(self.config.get('data_config'))
         self.metric = MetricInterface(self.config.get('metric_config'))
         self.network = NetworkInterface(self.config.get('network_config'))
-        super(Recorder, self).__init__(self.config, self.metric, self.network)
+        super().__init__(self.config, self.metric, self.network)
 
     def apply_model(self, data_loader, epoch=0, batch_type='test'):
         """

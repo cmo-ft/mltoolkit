@@ -28,6 +28,7 @@ class MetricInterface(ABC):
 
     def __init__(self, metric_config) -> None:
         self.metric_config = metric_config
+        self.setup(metric_config=metric_config)
 
     def setup(self, metric_config):
         """
@@ -53,7 +54,7 @@ class MetricInterface(ABC):
         """
         return self._metric.get_metric_keys()
 
-    def __call__(self, output: torch.Tensor, truth_label: torch.Tensor, weight=None) -> Tuple[torch.float, BaseMetric]:
+    def __call__(self, output: torch.Tensor, truth_label: torch.Tensor, weight=None) -> Tuple[torch.Tensor, BaseMetric]:
         """
         Evaluates the model's output and computes the loss and metrics.
 

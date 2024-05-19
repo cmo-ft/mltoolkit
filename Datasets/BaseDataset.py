@@ -6,9 +6,9 @@ from collections import namedtuple
 import torch_geometric
 import torch
 
-GraphDataFormat = namedtuple("GraphDataFormat", ["truth_label", "node_features", "edge_features", "global_features", "weight_original", "weight_train", "misc_features"])
+GraphDataFormat = namedtuple("GraphDataFormat", ["truth_label", "node_features", "edge_index", "edge_features", "global_features", "weight_original", "weight_train", "misc_features"])
 
-class BaseDataset(ABC, torch_geometric.data.Dataset):
+class BaseDataset(ABC):
     """
     Base class for creating custom datasets in PyTorch Geometric.
 
@@ -44,9 +44,9 @@ class BaseDataset(ABC, torch_geometric.data.Dataset):
             tree = ur.open(ntuple_path)[self.tree_name]
             data: pd.DataFrame = tree.arrays(self.branch_names, library="pd")
             for i in range(len(data)):
-                graph = self.generate_graph(data.iloc[i])
-                graph = torch_geometric.data.Data.from_dict(graph._asdict())
+                graph = self.generate_graph_data(data.iloc[i])
                 if graph is not None:
+                    graph = torch_geometric.data.Data.from_dict(graph._asdict())
                     self.graph_list.append(graph)
 
     def len(self):

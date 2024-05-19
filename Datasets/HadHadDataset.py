@@ -5,14 +5,14 @@ from Datasets.BaseDataset import BaseDataset, GraphDataFormat
 
 class HadHadGGFHighDataset(BaseDataset):
     def __init__(self, ntuple_path_list: list[str], fold_id: int, total_folds: int=3, graph_path: int=None):
-        super().__init__(ntuple_path_list, graph_path)
         self.fold_id = fold_id
         self.total_folds = total_folds
-
         self.nodes = ["bbtt_HH", "bbtt_HH_vis", "bbtt_H_bb", "bbtt_mmc", "met_NOSYS", "bbtt_H_vis_tautau", "bbtt_mmc_nu1", "bbtt_mmc_nu2", "bbtt_Tau1", "bbtt_Jet_b1", "bbtt_Jet_b2"]
         self.node_feature_format = ["{particle}_eta", "{particle}_phi", "{particle}_pt_NOSYS", "{particle}_E", "{particle}_m"]
         self.edge_feature_format = ["dR_{p0}{p1}", "dPhi_{p0}{p1}", "M_{p0}{p1}",]
         self.glob_features = ["num_jets", "T1", "mTtau1", "spher_bbtt", "cent_bbtt", "met_NOSYS_sumet"]
+
+        super().__init__(ntuple_path_list, graph_path)
 
     def get_tree_name(self):
         return "tree_2tag_OS_LL_GGFSR_350mHH"
@@ -23,13 +23,16 @@ class HadHadGGFHighDataset(BaseDataset):
         """
         if data['eventNumber']%self.total_folds!=self.fold_id:
             return None
-        truth_label = data["truth_label"]
+        # truth_label = data["truth_label"]
+        truth_label = data['BDT_score']>0.5
         node_features = self.generate_node_features(data)
         edge_index, edge_features = self.generate_edge_index_and_features(data)
         global_features = data[self.glob_features].values
         weight_original, weight_train = self.generate_original_and_train_weights(data)
         misc_features = None
-        return GraphDataFormat(truth_label, node_features, edge_index, edge_features, global_features, weight_original, weight_train, misc_features)
+        cur_graph = GraphDataFormat(truth_label, node_features, edge_index, edge_features, global_features, weight_original, weight_train, misc_features)
+
+        return cur_graph
         
 
     def generate_node_features(self, data: pd.Series) -> np.ndarray:
@@ -66,8 +69,8 @@ class HadHadGGFHighDataset(BaseDataset):
             for j in range(num_nodes):
                 if i==j:
                     continue
-                edge_index.append([i, j])
-                edge_features.append([ft_format.format(p0=self.nodes[i], p1=self.nodes[j]) for ft_format in self.edge_feature_format])
+                edge_index.extend([i, j])
+                edge_features.extend([ft_format.format(p0=self.nodes[i], p1=self.nodes[j]) for ft_format in self.edge_feature_format])
         edge_features = data[edge_features].values.reshape(-1, len(self.edge_feature_format))
         return np.array(edge_index), edge_features
         
@@ -81,5 +84,5 @@ class HadHadGGFHighDataset(BaseDataset):
         """
         origional_weight = data["weight_NOSYS"]
         train_weight = origional_weight.clip(0, 1)
-        train_weight = train_weight if data["truth_label"] == 0 else train_weight * 800
+        # train_weight = train_weight if data["truth_label"] == 0 else train_weight * 800
         return origional_weight, train_weight

@@ -1,13 +1,14 @@
 runner_type: Train 
 random_seed: 42
-num_epochs: 25
+num_epochs: 3
+learning_rate: 0.001
 
 save_dir: ./save/
 pre_trained: False
 pre_model_path: ./save/best_model.pt
 
 data_config:
-    data_class: HadHadDataset.HadHadGGFHighDataset 
+    dataclass: HadHadDataset.HadHadGGFHighDataset 
     fold_id: 0
     total_folds: 3
     batch_size: 1024

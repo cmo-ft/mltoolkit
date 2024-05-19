@@ -42,5 +42,7 @@ class BaseMetric(ABC):
     def __lt__(self, other):
         ...
 
-    def get_metric_keys(self)->list[str]:
-        return self.metrics.keys()
+    @classmethod
+    @abstractmethod
+    def get_metric_keys(cls)->list[str]:
+        ...

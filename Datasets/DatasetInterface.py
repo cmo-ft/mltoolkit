@@ -1,3 +1,6 @@
+import os
+import uproot as ur
+import pandas as pd
 from importlib import import_module
 from collections import deque
 import torch_geometric
@@ -45,7 +48,9 @@ class DatasetInterface():
         self.path_save_graphs = self.data_config.get('path_save_graphs')
 
         data_class_name = self.data_config.get('dataclass').split('.') # e.g. 'HadHadDataset.HadHadGGFHighDataset'
+        print(".".join(['Datasets'] + data_class_name[:-1]))
         self._dataclass = getattr(import_module(".".join(['Datasets'] + data_class_name[:-1])), data_class_name[-1])
+        self.dataloader_dict = {}
 
     def manipulate_folds(self)->None:
         """
@@ -77,10 +82,31 @@ class DatasetInterface():
         """
         if key not in self.dataloader_dict:
             if key=='train':
+                train_set = []
                 for idx in self.idx_dict['train']:
-                    train_set += self._dataclass(self.ntuple_path_list, idx, self.total_folds, self.path_save_graphs+'/train_graph.pt').graph_list
+                    train_set += self._dataclass(self.ntuple_path_list, idx, self.total_folds, self.path_save_graphs+f'/graph_fold{idx}.pt').graph_list
                 self.dataloader_dict[key] = torch_geometric.loader.DataLoader(train_set, batch_size=self.batch_size, shuffle=True)
             else:
-                self.dataloader_dict[key] = torch_geometric.loader.DataLoader(self._dataclass(self.ntuple_path_list, self.idx_dict[key], self.total_folds, self.path_save_graphs+f'{key}_graph.pt').graph_list, batch_size=self.batch_size, shuffle=False)
+                self.dataloader_dict[key] = torch_geometric.loader.DataLoader(self._dataclass(self.ntuple_path_list, self.idx_dict[key], self.total_folds, self.path_save_graphs+f'graph_fold{self.idx_dict[key]}.pt').graph_list, batch_size=self.batch_size, shuffle=False)
         
         return self.dataloader_dict[key]
+    
+    # def load_data(self, fold_id):
+    #     graph_path = self.path_save_graphs+f'graph_fold{fold_id}.pt'
+    #     if not os.path.exists(graph_path):
+    #         self.load()
+    #         if graph_path is not None:
+    #             torch.save(self.graph_list, graph_path)
+    #     else:
+    #         self.graph_list = torch.load(graph_path)
+
+    #     data_class = self._dataclass(self.ntuple_path_list, fold_id, self.total_folds, )
+
+    #     for ntuple_path in self.ntuple_path_list:
+    #         tree = ur.open(ntuple_path)[self.tree_name]
+    #         data: pd.DataFrame = tree.arrays(self.branch_names, library="pd")
+    #         for i in range(len(data)):
+    #             graph = self.generate_graph_data(data.iloc[i])
+    #             graph = torch_geometric.data.Data.from_dict(graph._asdict())
+    #             if graph is not None:
+    #                 self.graph_list.append(graph)

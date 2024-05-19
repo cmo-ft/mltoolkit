@@ -6,6 +6,10 @@ class ClassificationMetric(BaseMetric):
     def __init__(self, output, truth_label, weight) -> None:
         super().__init__(output, truth_label, weight)
 
+    @classmethod
+    def get_metric_keys(cls)->list[str]:
+        return ['accuracy', 'precision', 'recall', 'f1']
+
     def compute_metrics(self, output: torch.Tensor, truth_label: torch.Tensor, weight: torch.Tensor)->dict[str, float]:
         prediction = output.argmax(dim=1)
         tp = (prediction * truth_label).sum()

@@ -269,9 +269,9 @@ class AttentionNet(torch.nn.Module):
         self.output_activation = torch.nn.Softmax(dim=1)
 
     def forward(self, batch):
-        node_attr = self.input_embedding(batch.x)
-        u = self.glob_embedding(batch.u)
-        edge_attr = self.edge_embedding(batch.edge_attr)
+        node_attr = self.input_embedding(batch.node_features)
+        u = self.glob_embedding(batch.global_features)
+        edge_attr = self.edge_embedding(batch.edge_features)
 
         for idx, layer in enumerate(self.conv_process):
             node_attr, edge_attr = layer(node_attr, edge_attr, batch.edge_index, batch.batch)

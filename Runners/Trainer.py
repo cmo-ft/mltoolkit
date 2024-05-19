@@ -15,13 +15,12 @@ class Trainer(BaseRunner):
                 cooldown=0, min_lr=1e-8, eps=1e-8)
 
     def execute(self):
-        epoch_start, epoch_end = self.init_epoch_id, self.init_epoch_id+self.num_epochs
-        for epoch in range(epoch_start, epoch_end):
+        for epoch in range(self.epoch_start, self.epoch_end):
             self.begin_of_epoch()
             # train one epoch
             log.info(f"Training with learning rate: {self.optimizer.param_groups[0]['lr']}")
             start_time = time.time()
-            self.train_model(data_loader=self.dataset.get('train'), epoch=epoch)
+            self.train_model(data_loader=self.dataset.get_dataloader('train'), epoch=epoch)
             log.info(f"Complete in {(time.time()-start_time)/60.:.2f} min.")
             
             # Validate one epoch
