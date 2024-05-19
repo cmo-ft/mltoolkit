@@ -10,10 +10,33 @@ from Metrics.BaseMetric import BaseMetric
 log = logging.getLogger(__name__)
 
 class MetricInterface(ABC):
+    """
+    Interface for metrics used in machine learning models.
+
+    This class defines the common interface for metrics used to evaluate machine learning models.
+    Subclasses should implement the necessary methods to compute the metric and provide the metric keys.
+
+    Attributes:
+        metric_config (dict): Configuration for the metric.
+
+    Methods:
+        setup(metric_config): Set up the metric using the provided configuration.
+        get_metric_keys(): Get the keys associated with the metric.
+        __call__(output, truth_label, weight=None): Evaluate the model's output and compute the loss and metrics.
+
+    """
+
     def __init__(self, metric_config) -> None:
         self.metric_config = metric_config
 
     def setup(self, metric_config):
+        """
+        Set up the metric using the provided configuration.
+
+        Args:
+            metric_config (dict): Configuration for the metric.
+
+        """
         loss_function_name = metric_config['loss_function']
         self.loss_func = getattr(nn, loss_function_name)(reduction='none')
 
@@ -21,6 +44,13 @@ class MetricInterface(ABC):
         self._metric = getattr(import_module(".".join(['Metrics'] + metric_class_name[:-1])), metric_class_name[-1])
     
     def get_metric_keys(self)->list[str]:
+        """
+        Get the keys associated with the metric.
+
+        Returns:
+            list[str]: A list of metric keys.
+
+        """
         return self._metric.get_metric_keys()
 
     def __call__(self, output: torch.Tensor, truth_label: torch.Tensor, weight=None) -> Tuple[torch.float, BaseMetric]:
