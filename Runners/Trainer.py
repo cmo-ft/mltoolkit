@@ -1,12 +1,8 @@
 import torch
 import logging
 import time
-import numpy as np
 from torch_geometric import loader as tg_loader
-import pandas as pd
-from collections import namedtuple
 from Runners.BaseRunner import BaseRunner
-from utils import utils
 
 log = logging.getLogger(__name__)
 
@@ -18,9 +14,6 @@ class Trainer(BaseRunner):
                 cooldown=0, min_lr=1e-8, eps=1e-8)
 
     def execute(self):
-        self.BestEpoch = namedtuple('BestEpoch', ['epoch', 'loss'])
-        self.best_epoch = self.BestEpoch(0, float('inf'))
-
         epoch_start, epoch_end = self.init_epoch_id, self.init_epoch_id+self.num_epochs
         for epoch in range(epoch_start, epoch_end):
             self.begin_of_epoch()
