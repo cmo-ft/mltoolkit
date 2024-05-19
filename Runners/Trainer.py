@@ -1,5 +1,4 @@
 import torch
-import torchinfo
 import logging
 import time
 import numpy as np
@@ -50,4 +49,4 @@ class Trainer(BaseRunner):
         self.end_of_epoch(output=output_save, truth_label=truth_save, weight=weight_save, test_epoch=True)
 
     def finish(self):
-        self.save(record_path=f'{self.save_dir}/run_record.csv', model_path=f'{self.save_dir}/model.pt')
+        log.info("Finished training.")
