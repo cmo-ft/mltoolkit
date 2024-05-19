@@ -1,12 +1,13 @@
+import torch
 from Metrics.BaseMetric import BaseMetric
 
 
 class ClassificationMetric(BaseMetric):
     def __init__(self, output, truth_label, weight) -> None:
         super().__init__(output, truth_label, weight)
-        self.metrics = self.compute_metrics(output, truth_label, weight)
 
-    def compute_metrics(self, prediction, truth_label, weight)->dict[str, float]:
+    def compute_metrics(self, output: torch.Tensor, truth_label: torch.Tensor, weight: torch.Tensor)->dict[str, float]:
+        prediction = output.argmax(dim=1)
         tp = (prediction * truth_label).sum()
         fp = (prediction * (1 - truth_label)).sum()
         fn = ((1 - prediction) * truth_label).sum()

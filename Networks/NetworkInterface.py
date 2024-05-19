@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 
 
-class NetworkWrapper():
+class NetworkInterface():
     def __init__(self, network_config, pre_model_path=None) -> None:
         self.network_config = network_config
         self.pre_model_path = pre_model_path
