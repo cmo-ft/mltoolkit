@@ -24,7 +24,7 @@ class NetworkInterface():
         """
         # Load Network Structure
         self.network_name = self.network_config.get('Network')
-        module_name = f'Tools.Networks.{self.network_name}'
+        module_name = f'Networks.{self.network_name}'
         self.model = getattr(import_module(module_name), self.network_name)(self.network_config.get('model_setting'))
 
         # Initialize Network

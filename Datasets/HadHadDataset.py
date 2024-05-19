@@ -4,8 +4,8 @@ import numpy as np
 from Datasets.BaseDataset import BaseDataset, GraphDataFormat
 
 class HadHadGGFHighDataset(BaseDataset):
-    def __init__(self, ntuple_path_list: list[str], fold_id: int, total_folds: int=3, path_save_graphs: int=None):
-        super().__init__(ntuple_path_list, path_save_graphs)
+    def __init__(self, ntuple_path_list: list[str], fold_id: int, total_folds: int=3, graph_path: int=None):
+        super().__init__(ntuple_path_list, graph_path)
         self.fold_id = fold_id
         self.total_folds = total_folds
 

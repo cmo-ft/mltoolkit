@@ -31,7 +31,7 @@ class Recorder:
         log.info(f"Network info: {network_info}")
         pre_trained = self.config.get("pre_trained")
         if pre_trained:
-            self.network.load_model(pre_trained)
+            self.network.load_model(self.config.get("pre_model_path"))
             self.record = pd.read_csv(self.record_path)
             self.epoch_start = self.record.get('epoch')[-1] + 1
         else:

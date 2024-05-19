@@ -1,21 +1,25 @@
 runner_type: Train 
 random_seed: 42
-batch_size: 1024
+num_epochs: 25
+
 save_dir: ./save/
-runner_config:
-    num_epochs: 25
-    learning_rate: 0.008
-    pretrain: False
-    pre_model_path: ./save/model.pt # functions only when pretrain is True
-    pre_run_record: ./save/run_record.csv
+pre_trained: False
+pre_model_path: ./save/best_model.pt
 
 data_config:
-    dataset_prefix: /lustre/collider/mocen/project/bbtautau/machinelearning/traindir/hadhad/ggF_high/dataset
+    data_class: HadHadDataset.HadHadGGFHighDataset 
     fold_id: 0
-    num_folds: 3
+    total_folds: 3
+    batch_size: 1024
     signal_scale_factor: 800
+    path_save_graphs: ./save/
+    ntuple_path_list: [
+        /lustre/collider/mocen/project/bbtautau/hhard/lxplus-sync/sample_hadhad/hhttbb.root,
+        /lustre/collider/mocen/project/bbtautau/hhard/lxplus-sync/sample_hadhad/ttbar.root,
+    ]
 
-evaluator_config:
+metric_config:
+    metric: ClassificationMetric.ClassificationMetric
     loss_function: CrossEntropyLoss
 
 network_config:

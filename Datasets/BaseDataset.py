@@ -14,20 +14,20 @@ class BaseDataset(ABC, torch_geometric.data.Dataset):
 
     Args:
         ntuple_path_list (list[str]): List of paths to the input ntuple files.
-        path_save_graphs (str, optional): Path to save the preprocessed graph data. If provided,
+        graph_path (str, optional): Path to save the preprocessed graph data. If provided,
             the graph data will be loaded from this path if it exists, otherwise it will be generated
             and saved to this path. Defaults to None.
     """
 
-    def __init__(self, ntuple_path_list, path_save_graphs=None):
+    def __init__(self, ntuple_path_list, graph_path=None):
         self.ntuple_path_list = ntuple_path_list
         self.graph_list = []
-        if (path_save_graphs is not None) or (not os.path.exists(path_save_graphs)):
+        if (graph_path is not None) or (not os.path.exists(graph_path)):
             self.load()
-            if path_save_graphs is not None:
-                torch.save(self.graph_list, path_save_graphs)
+            if graph_path is not None:
+                torch.save(self.graph_list, graph_path)
         else:
-            self.graph_list = torch.load(path_save_graphs)
+            self.graph_list = torch.load(graph_path)
 
     def load(self):
         """

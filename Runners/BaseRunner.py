@@ -64,7 +64,7 @@ class BaseRunner(ABC, Recorder):
             for batch_id, batch in enumerate(data_loader, 0):
                 # Model output
                 batch = batch.to(self.device)
-                truth_label=batch.y
+                truth_label=batch.truth_label
                 output = self.network(batch)
                 loss, metrics = self.metric(output=output, truth_label=truth_label, weight=batch.weight_train)
                 self.end_of_batch(epoch=epoch, batch_type=batch_type, batch_id=batch_id, batch_weight=batch.weight_train.sum(), learning_rate=0, loss=loss.item(), metrics=metrics)
@@ -93,7 +93,7 @@ class BaseRunner(ABC, Recorder):
             # Model output
             batch = batch.to(self.device)
             output = self.network(batch)
-            truth_label=batch.y
+            truth_label=batch.truth_label
             loss, metrics = self.metric(output=output, truth_label=truth_label, weight=batch.weight_train)
             # backward pass: compute gradient of the loss with respect to model parameters
             loss.backward()

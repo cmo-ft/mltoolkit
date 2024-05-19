@@ -78,9 +78,9 @@ class DatasetInterface():
         if key not in self.dataloader_dict:
             if key=='train':
                 for idx in self.idx_dict['train']:
-                    train_set += self._dataclass(self.ntuple_path_list, idx, self.total_folds, self.path_save_graphs).graph_list
+                    train_set += self._dataclass(self.ntuple_path_list, idx, self.total_folds, self.path_save_graphs+'/train_graph.pt').graph_list
                 self.dataloader_dict[key] = torch_geometric.loader.DataLoader(train_set, batch_size=self.batch_size, shuffle=True)
             else:
-                self.dataloader_dict[key] = torch_geometric.loader.DataLoader(self._dataclass(self.ntuple_path_list, self.idx_dict[key], self.total_folds, self.path_save_graphs).graph_list, batch_size=self.batch_size, shuffle=False)
+                self.dataloader_dict[key] = torch_geometric.loader.DataLoader(self._dataclass(self.ntuple_path_list, self.idx_dict[key], self.total_folds, self.path_save_graphs+f'{key}_graph.pt').graph_list, batch_size=self.batch_size, shuffle=False)
         
         return self.dataloader_dict[key]
