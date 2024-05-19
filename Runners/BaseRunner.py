@@ -67,11 +67,11 @@ class BaseRunner(Recorder):
                 truth_label=batch.truth_label
                 output = self.network(batch)
                 loss, metrics = self.metric(output=output, truth_label=truth_label, weight=batch.weight_train)
-                self.end_of_batch(epoch=epoch, batch_type=batch_type, batch_id=batch_id, batch_weight=batch.weight_train.sum(), learning_rate=0, loss=loss.item(), metrics=metrics)
+                self.end_of_batch(epoch=epoch, batch_type=batch_type, batch_id=batch_id, batch_weight=batch.weight_train.cpu().sum().item(), learning_rate=0, loss=loss.detach().cpu().item(), metrics=metrics)
 
                 output_save.append(output.detach().cpu())
                 truth_label_save.append(truth_label.detach().cpu())
-                weight_save.append(batch.weight.detach().cpu())
+                weight_save.append(batch.weight_train.detach().cpu())
         return torch.cat(output_save), torch.cat(truth_label_save), torch.cat(weight_save)
     
     def train_model(self, data_loader, epoch):
@@ -99,7 +99,7 @@ class BaseRunner(Recorder):
             loss.backward()
             self.optimizer.step()
             # record result
-            self.end_of_batch(epoch=epoch, batch_type='train', batch_id=batch_id, batch_weight=batch.weight.sum(), learning_rate=self.optimizer.param_groups[0]['lr'], loss=loss.item(), metrics=metrics)
+            self.end_of_batch(epoch=epoch, batch_type='train', batch_id=batch_id, batch_weight=batch.weight_train.cpu().sum().item(), learning_rate=self.optimizer.param_groups[0]['lr'], loss=loss.detach().cpu().item(), metrics=metrics)
 
     @abstractmethod
     def execute(self):

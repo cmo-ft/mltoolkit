@@ -22,7 +22,7 @@ class BaseDataset(ABC):
     def __init__(self, ntuple_path_list, graph_path=None):
         self.ntuple_path_list = ntuple_path_list
         self.graph_list = []
-        if (graph_path is not None) or (not os.path.exists(graph_path)):
+        if (graph_path is None) or (not os.path.exists(graph_path)):
             self.load()
             if graph_path is not None:
                 torch.save(self.graph_list, graph_path)

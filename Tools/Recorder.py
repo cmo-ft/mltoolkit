@@ -51,12 +51,12 @@ class Recorder:
 
 
     def end_of_batch(self, epoch: int, batch_type: str, batch_id: int, batch_weight: float, learning_rate: float, loss: float, metrics: BaseMetric):
-        self.record = self.record.append({'epoch': epoch, 'batch_type': batch_type, 'batch_id': batch_id, 'batch_weight': batch_weight, 'loss': loss, **(metrics.metrics)}, ignore_index=True)
+        self.record = self.record.append({'epoch': epoch, 'batch_type': batch_type, 'batch_id': batch_id, 'batch_weight': batch_weight, 'learning_rate': learning_rate, 'loss': loss, **(metrics.metrics)}, ignore_index=True)
 
 
     def end_of_epoch(self, output: torch.Tensor, truth_label: torch.Tensor, weight: torch.Tensor, test_epoch=False):
         self.record.to_csv(self.record_path, index=None)
-        arr_to_save = torch.cat([output, truth_label, weight], dim=1).numpy()
+        arr_to_save = torch.cat([output, truth_label.view(len(weight), -1), weight.view(-1,1)], dim=1).numpy()
 
         cur_loss, cur_metric = self.metric(output, truth_label, weight)
         cur_loss = cur_loss.item()
@@ -107,7 +107,7 @@ class Recorder:
         # Plot scores
         plot = utils.PlotContainer(xlabel='Score', ylabel='A.U.', figname=f'{self.save_dir}/scores.pdf')
         bins = 50
-        plot.ax.hist(score[signal_mask], bins=bins, weights=weight[signal_mask], label=rf'Signal$\times${self.signal_scale_factor:.0f}', color='red', histtype='step', linewidth=2)
+        plot.ax.hist(score[signal_mask], bins=bins, weights=weight[signal_mask], label=rf'Signal', color='red', histtype='step', linewidth=2)
         plot.ax.hist(score[~signal_mask], bins=bins, weights=weight[~signal_mask], label='Background', color='blue', histtype='step', linewidth=2)
         plot.apply_settings()
         plot.ax.legend(loc='upper center')

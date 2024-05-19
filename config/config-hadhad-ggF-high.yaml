@@ -40,5 +40,5 @@ network_config:
         dim_embedding: 32
         global_features: 6
         edge_features: 3
-        input_features: 8
+        input_features: 7
         output_classes: 2

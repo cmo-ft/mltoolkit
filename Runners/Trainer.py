@@ -33,7 +33,7 @@ class Trainer(BaseRunner):
 
         # Test model 
         # get best epoch
-        epoch = self.best_epoch.epoch
+        epoch = self.best_epoch
         log.info(f"Testing model from epoch {epoch}...")
         start_time = time.time()
         self.network.load_model(f'{self.save_dir}/best_model.pt')

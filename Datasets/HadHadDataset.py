@@ -1,3 +1,4 @@
+import torch
 from typing import Tuple
 import pandas as pd
 import numpy as np
@@ -30,7 +31,7 @@ class HadHadGGFHighDataset(BaseDataset):
         global_features = data[self.glob_features].values
         weight_original, weight_train = self.generate_original_and_train_weights(data)
         misc_features = None
-        cur_graph = GraphDataFormat(truth_label, node_features, edge_index, edge_features, global_features, weight_original, weight_train, misc_features)
+        cur_graph = GraphDataFormat(torch.tensor(truth_label, dtype=torch.long), torch.tensor(node_features, dtype=torch.float), torch.tensor(edge_index, dtype=torch.long), torch.tensor(edge_features, dtype=torch.float), torch.tensor(global_features, dtype=torch.float).view(1,-1), torch.tensor(weight_original, dtype=torch.float), torch.tensor(weight_train, dtype=torch.float), misc_features)
 
         return cur_graph
         
@@ -63,13 +64,14 @@ class HadHadGGFHighDataset(BaseDataset):
             edge_features: shape (num_edges, len(self.edge_feature_format)), each row is a edge, each element is the feature of the edge
         """
         num_nodes = len(self.nodes)
-        edge_index = []
+        edge_index = [[], []]
         edge_features = []
         for i in range(num_nodes):
             for j in range(num_nodes):
                 if i==j:
                     continue
-                edge_index.extend([i, j])
+                edge_index[0].append(i)
+                edge_index[1].append(j)
                 edge_features.extend([ft_format.format(p0=self.nodes[i], p1=self.nodes[j]) for ft_format in self.edge_feature_format])
         edge_features = data[edge_features].values.reshape(-1, len(self.edge_feature_format))
         return np.array(edge_index), edge_features
