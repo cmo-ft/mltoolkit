@@ -8,7 +8,7 @@ The MLToolkit is a comprehensive machine learning library for developing and dep
 
 - `Datasets`:  This directory contains scripts for data preprocessing, including details on graph construction, features within each graph, and weight definitions. To create a custom dataset, derive a new class from `Datasets/BaseDataset.py` and specify it in the `data_config/dataclass` section of config.yaml. For reference, consult `Datasets/HadHadDataset.py`.
 
-- `Metrics`: This directory contains scripts for calculating and evaluating different performance metrics of the machine learning models. To introduce a custom metric, create a new class derived from `Metrics/BaseMetric.py` and specify it in the `metric_config/metric` section of config.yaml. Refer to Metrics/ClassificationMetric.py for guidance.
+- `Metrics`: This directory contains scripts for calculating and evaluating different performance metrics of the machine learning models. To introduce a custom metric, create a new class derived from `Metrics/BaseMetric.py` and specify it in the `metric_config/metric` section of config.yaml. Refer to `Metrics/ClassificationMetric.py` for guidance.
 
 - `Networks`: This directory contains the different neural network architectures that can be used in the machine learning tasks. To employ a new network structure, place it in `Networks/` and specify it in the `network_config/Network` section of `config.yaml`.
 
