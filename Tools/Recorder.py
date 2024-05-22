@@ -43,6 +43,7 @@ class Recorder:
         self.epoch_end = self.epoch_start+self.num_epochs
         self.cur_epoch = self.epoch_start
         self.best_epoch = self.epoch_start
+        self.epoch_start_time = time.time()
     
 
     def begin_of_epoch(self):
@@ -61,13 +62,13 @@ class Recorder:
         cur_loss, cur_metric = self.metric(output, truth_label, weight)
         cur_loss = cur_loss.item()
         if not test_epoch:
-            self.network.save_model(f'{self.save_dir}/model{self.cur_epoch}.pt')
+            self.network.save_model(f'{self.save_dir}/models/model{self.cur_epoch}.pt')
             np.save(f"{self.save_dir}/valset_result.npy",arr=arr_to_save)
 
             if (self.best_epoch==self.cur_epoch) or (cur_metric > self.best_metric):
                 self.best_epoch = self.cur_epoch
                 self.best_metric = cur_metric
-                self.network.save_model(f'{self.save_dir}/best_model.pt')
+                self.network.save_model(f'{self.save_dir}/models/best_model.pt')
             log.info(f'Best epoch: {self.best_epoch} with metrics: {self.best_metric.metrics}.')
         else:
             np.save(f"{self.save_dir}/testset_result.npy",arr=arr_to_save)

@@ -36,7 +36,7 @@ class Trainer(BaseRunner):
         epoch = self.best_epoch
         log.info(f"Testing model from epoch {epoch}...")
         start_time = time.time()
-        self.network.load_model(f'{self.save_dir}/best_model.pt')
+        self.network.load_model(f'{self.save_dir}/models/best_model.pt', device=self.config.get('device'))
         data_loader = self.dataset.get_dataloader('test')
         output_save, truth_save, weight_save = self.apply_model(data_loader=data_loader, epoch=epoch, batch_type='test')
         self.end_of_epoch(output=output_save, truth_label=truth_save, weight=weight_save, test_epoch=True)

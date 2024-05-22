@@ -33,14 +33,14 @@ class NetworkInterface():
         else:
             self.load_model(self.pre_model_path)
 
-    def load_model(self, model_path):
+    def load_model(self, model_path, device='cpu'):
         """
         Load a pre-trained model from the given path.
 
         Args:
             model_path (str): Path to the pre-trained model.
         """
-        self.model.load_state_dict(torch.load(model_path))
+        self.model.load_state_dict(torch.load(model_path, map_location=torch.device(device)))
 
     def save_model(self, model_path='./save/net.pt'):
         """
