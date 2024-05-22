@@ -17,7 +17,7 @@ The MLToolkit is a comprehensive machine learning library for developing and dep
 
 - `Runners`: This directory contains scripts that manage model training, testing, and related processes such as model selection, hyperparameter tuning, and cross-validation.
 
-- `Tools`: This directory contains utility scripts that are used across the project. 
+- `Tools`: This directory contains utility scripts that are used across the project. `Tools/Recorder.py` is used to make records in the end of each batch and in the beginning and end of each epoch. The Training results and monitoring of training is also done by this script.
 
 ## Usage
 
