@@ -1,4 +1,3 @@
-#!/lustre/collider/mocen/software/condaenv/hailing/bin/python
 import os
 import yaml
 import random
