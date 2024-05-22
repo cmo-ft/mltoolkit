@@ -33,7 +33,7 @@ class Recorder:
         if pre_trained:
             self.network.load_model(self.config.get("pre_model_path"))
             self.record = pd.read_csv(self.record_path)
-            self.epoch_start = self.record.get('epoch')[-1] + 1
+            self.epoch_start = self.record['epoch'].iloc[-1] + 1
         else:
             self.record = pd.DataFrame(columns=['epoch', 'batch_type', 'batch_id', 'batch_weight', 'learning_rate', 'loss'] + self.metric.get_metric_keys())
             self.epoch_start = 0
