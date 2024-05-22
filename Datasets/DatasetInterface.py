@@ -84,10 +84,10 @@ class DatasetInterface():
             if key=='train':
                 train_set = []
                 for idx in self.idx_dict['train']:
-                    train_set += self._dataclass(self.ntuple_path_list, idx, self.total_folds, self.path_save_graphs+f'/graph_fold{idx}.pt').graph_list
+                    train_set += self._dataclass(self.ntuple_path_list, idx, self.total_folds, self.path_save_graphs+f'/graph_fold{idx}.pt', signal_scale_factor=self.data_config['signal_scale_factor']).graph_list
                 self.dataloader_dict[key] = torch_geometric.loader.DataLoader(train_set, batch_size=self.batch_size, shuffle=True)
             else:
-                self.dataloader_dict[key] = torch_geometric.loader.DataLoader(self._dataclass(self.ntuple_path_list, self.idx_dict[key], self.total_folds, self.path_save_graphs+f'graph_fold{self.idx_dict[key]}.pt').graph_list, batch_size=self.batch_size, shuffle=False)
+                self.dataloader_dict[key] = torch_geometric.loader.DataLoader(self._dataclass(self.ntuple_path_list, self.idx_dict[key], self.total_folds, self.path_save_graphs+f'graph_fold{self.idx_dict[key]}.pt', signal_scale_factor=self.data_config['signal_scale_factor']).graph_list, batch_size=self.batch_size, shuffle=False)
         
         return self.dataloader_dict[key]
     

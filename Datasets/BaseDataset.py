@@ -19,8 +19,9 @@ class BaseDataset(ABC):
             and saved to this path. Defaults to None.
     """
 
-    def __init__(self, ntuple_path_list, graph_path=None):
+    def __init__(self, ntuple_path_list, graph_path=None, signal_scale_factor: float=1.):
         self.ntuple_path_list = ntuple_path_list
+        self.signal_scale_factor = signal_scale_factor
         self.graph_list = []
         if (graph_path is None) or (not os.path.exists(graph_path)):
             self.load()
@@ -44,7 +45,7 @@ class BaseDataset(ABC):
             tree = ur.open(ntuple_path)[self.tree_name]
             data: pd.DataFrame = tree.arrays(self.branch_names, library="pd")
             for i in range(len(data)):
-                graph = self.generate_graph_data(data.iloc[i])
+                graph = self.generate_graph_data(data.iloc[i], ntuple_path)
                 if graph is not None:
                     graph = torch_geometric.data.Data.from_dict(graph._asdict())
                     self.graph_list.append(graph)
@@ -69,7 +70,7 @@ class BaseDataset(ABC):
         return None
 
     @abstractmethod
-    def generate_graph_data(self, data: pd.Series)->GraphDataFormat:
+    def generate_graph_data(self, data: pd.Series, data_path: str)->GraphDataFormat:
         """
         Generates graph data based on the given input data.
 

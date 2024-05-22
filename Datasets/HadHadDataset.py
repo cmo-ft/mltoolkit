@@ -5,31 +5,32 @@ import numpy as np
 from Datasets.BaseDataset import BaseDataset, GraphDataFormat
 
 class HadHadGGFHighDataset(BaseDataset):
-    def __init__(self, ntuple_path_list: list[str], fold_id: int, total_folds: int=3, graph_path: int=None):
+    def __init__(self, ntuple_path_list: list[str], fold_id: int, total_folds: int=3, graph_path: int=None, signal_scale_factor: float=1.):
         self.fold_id = fold_id
         self.total_folds = total_folds
+        self.signal_scale_factor = signal_scale_factor
         self.nodes = ["bbtt_HH", "bbtt_HH_vis", "bbtt_H_bb", "bbtt_mmc", "met_NOSYS", "bbtt_H_vis_tautau", "bbtt_mmc_nu1", "bbtt_mmc_nu2", "bbtt_Tau1", "bbtt_Jet_b1", "bbtt_Jet_b2"]
         self.node_feature_format = ["{particle}_eta", "{particle}_phi", "{particle}_pt_NOSYS", "{particle}_E", "{particle}_m"]
         self.edge_feature_format = ["dR_{p0}{p1}", "dPhi_{p0}{p1}", "M_{p0}{p1}",]
         self.glob_features = ["num_jets", "T1", "mTtau1", "spher_bbtt", "cent_bbtt", "met_NOSYS_sumet"]
 
-        super().__init__(ntuple_path_list, graph_path)
+        super().__init__(ntuple_path_list, graph_path, signal_scale_factor)
 
     def get_tree_name(self):
         return "tree_2tag_OS_LL_GGFSR_350mHH"
 
-    def generate_graph_data(self, data: pd.Series) -> GraphDataFormat:
+    def generate_graph_data(self, data: pd.Series, data_path: str) -> GraphDataFormat:
         """
         Generates graph data in the specified format.
         """
         if data['eventNumber']%self.total_folds!=self.fold_id:
             return None
         # truth_label = data["truth_label"]
-        truth_label = data['BDT_score']>0.5
+        truth_label = int('hhttbb' in data_path)
         node_features = self.generate_node_features(data)
         edge_index, edge_features = self.generate_edge_index_and_features(data)
         global_features = data[self.glob_features].values
-        weight_original, weight_train = self.generate_original_and_train_weights(data)
+        weight_original, weight_train = self.generate_original_and_train_weights(data, truth_label)
         misc_features = None
         cur_graph = GraphDataFormat(torch.tensor(truth_label, dtype=torch.long), torch.tensor(node_features, dtype=torch.float), torch.tensor(edge_index, dtype=torch.long), torch.tensor(edge_features, dtype=torch.float), torch.tensor(global_features, dtype=torch.float).view(1,-1), torch.tensor(weight_original, dtype=torch.float), torch.tensor(weight_train, dtype=torch.float), misc_features)
 
@@ -77,7 +78,7 @@ class HadHadGGFHighDataset(BaseDataset):
         return np.array(edge_index), edge_features
         
 
-    def generate_original_and_train_weights(self, data: pd.Series) -> Tuple[float, float]:
+    def generate_original_and_train_weights(self, data: pd.Series, truth_label: int) -> Tuple[float, float]:
         """
         Generates the original weight and train weight based on the given data.
 
@@ -86,5 +87,5 @@ class HadHadGGFHighDataset(BaseDataset):
         """
         origional_weight = data["weight_NOSYS"]
         train_weight = origional_weight.clip(0, 1)
-        # train_weight = train_weight if data["truth_label"] == 0 else train_weight * 800
+        train_weight = train_weight if truth_label==0 else train_weight * self.signal_scale_factor
         return origional_weight, train_weight
