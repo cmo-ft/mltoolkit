@@ -2,6 +2,9 @@
 
 The MLToolkit is a comprehensive machine learning library for developing and deploying machine learning models for bbtautau tasks. It is designed to be flexible, scalable, and easy to use.
 
+## Requirements
+`numpy pandas pytorch torch-geometric torchsummary...`
+
 ## Directory Structure
 
 - `bin`: This directory contains executable scripts for running the framework.
@@ -27,7 +30,21 @@ The MLToolkit is a comprehensive machine learning library for developing and dep
 2. **Run the toolkit**: The `run_mltoolkit.py` script is the main entry point to the toolkit. It takes a configuration file as an argument, which specifies various parameters for the machine learning task, such as the dataset to use, the model to train, and the hyperparameters for training. The configuration file is in YAML format. To run the toolkit with a specific configuration file (e.g., `config.yaml`), use the following command:
 
     ```bash
-    python run_mltoolkit.py -c config.yaml
+    python ${MLTOOLKIT_PATH}/bin/run_mltoolkit.py -c config.yaml
     ```
 
     Replace `config.yaml` with the path to your own configuration file. The `-c` flag is used to specify the configuration file.
+
+## Example
+We have provided a small slice of dataset and a pre-trained model in `example` directory. You may run the example by:
+```
+cd ${MLTOOLKIT_PATH}
+source setup.sh
+cd example
+python ../bin/run_mltoolkit.py -c config-example.yaml 
+```
+Resulted plots can then be found in `example/save/`.
+
+
+## Note
+Graphs generated during train/test session will be stored as `save/graph_fold${i}.pt`. They will be employed by the new training round. Make sure to remove them if you want to use an updated graph construction method.
