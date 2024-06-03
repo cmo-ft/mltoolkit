@@ -45,5 +45,5 @@ class MuonEnergyDataset(BaseDataset):
             pos = pos,
             t = t,
             # edge_index = edge_index,
-            weight_train = torch.tensor(1.0, dtype=torch.float32),
+            weight_train = torch.tensor(1.0, dtype=torch.float32).view(1,1),
         )
