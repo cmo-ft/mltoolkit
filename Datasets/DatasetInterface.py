@@ -67,7 +67,7 @@ class DatasetInterface():
             for p in self.data_config.get(key):
                 tmp_paths = subprocess.run( 'ls ' + p, shell=True, capture_output=True, text=True)
                 paths += tmp_paths.stdout.split('\n')[:-1] # last element is empty string so remove it
-            self.dataloader_dict[key] = torch_geometric.loader.DataLoader(self._dataclass(paths, f'{self.path_save_graphs}/{key}.pt').graph_list, batch_size=self.batch_size, shuffle=False)
+            self.dataloader_dict[key] = torch_geometric.loader.DataLoader(self._dataclass(paths, f'{self.path_save_graphs}/{key}.pt').graph_list, batch_size=self.batch_size, shuffle=False if key!='train' else True)
 
         return self.dataloader_dict[key]
     
