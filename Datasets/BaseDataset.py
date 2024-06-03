@@ -19,36 +19,22 @@ class BaseDataset(ABC):
             and saved to this path. Defaults to None.
     """
 
-    def __init__(self, ntuple_path_list, graph_path=None, signal_scale_factor: float=1.):
-        self.ntuple_path_list = ntuple_path_list
-        self.signal_scale_factor = signal_scale_factor
+    def __init__(self, data_path_list, graph_path=None):
+        self.data_path_list = data_path_list
         self.graph_list = []
         if (graph_path is None) or (not os.path.exists(graph_path)):
-            self.load()
+            self.load_graphs_into_graph_list()
             if graph_path is not None:
                 torch.save(self.graph_list, graph_path)
         else:
             self.graph_list = torch.load(graph_path)
 
-    def load(self):
+    @abstractmethod
+    def load_graphs_into_graph_list(self):
         """
-        Loads the input data and generates the graph data.
-
-        This method is called during initialization to load the input data from the ntuple files
-        and generate the graph data for each entry.
-
-        Raises:
-            FileNotFoundError: If the ntuple file specified in `ntuple_path_list` does not exist.
+        Loads the graph data into self.graph_list
         """
-        self.tree_name, self.branch_names = self.get_tree_name(), self.get_branch_names()
-        for ntuple_path in self.ntuple_path_list:
-            tree = ur.open(ntuple_path)[self.tree_name]
-            data: pd.DataFrame = tree.arrays(self.branch_names, library="pd")
-            for i in range(len(data)):
-                graph = self.generate_graph_data(data.iloc[i], ntuple_path)
-                if graph is not None:
-                    graph = torch_geometric.data.Data.from_dict(graph._asdict())
-                    self.graph_list.append(graph)
+        ...
 
     def len(self):
         return len(self.graph_list)
@@ -61,23 +47,3 @@ class BaseDataset(ABC):
     
     def __getitem__(self, idx)->torch_geometric.data.Data:
         return self.get(idx)
-
-    @abstractmethod
-    def get_tree_name(self)->str:
-        ...
-
-    def get_branch_names(self)->list[str]:
-        return None
-
-    @abstractmethod
-    def generate_graph_data(self, data: pd.Series, data_path: str)->GraphDataFormat:
-        """
-        Generates graph data based on the given input data.
-
-        Args:
-            data (pd.Series): The input data to generate graph data from.
-
-        Returns:
-            GraphDataFormat: The generated graph data in the specified format.
-        """
-        ...

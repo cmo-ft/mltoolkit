@@ -8,23 +8,26 @@ pre_trained: False
 pre_model_path: ./save/models/best_model.pt
 
 data_config:
-    dataclass: HadHadDataset.HadHadGGFHighDataset 
-    fold_id: 0
-    total_folds: 3
+    dataclass: MuonDataset.MuonEnergyDataset 
     batch_size: 1024
     signal_scale_factor: 800
     path_save_graphs: ./save/
-    ntuple_path_list: [
-        /lustre/collider/mocen/project/bbtautau/hhard/lxplus-sync/sample_hadhad/hhttbb.root,
-        /lustre/collider/mocen/project/bbtautau/hhard/lxplus-sync/sample_hadhad/ttbar.root,
+    train: [
+        "/lustre/collider/mocen/project/hailing/machineLearning/workspace_after_20240529/mltoolkit/preprocess/train/*_1.pt",
+    ]
+    validation: [
+        "/lustre/collider/mocen/project/hailing/machineLearning/workspace_after_20240529/mltoolkit/preprocess/validation/*1.pt",
+    ]
+    test: [
+        "/lustre/collider/mocen/project/hailing/machineLearning/workspace_after_20240529/mltoolkit/preprocess/test/*1.pt",
     ]
 
 metric_config:
-    metric: ClassificationMetric.ClassificationMetric
-    loss_function: CrossEntropyLoss
+    metric: RegressionMetric.RegressionMetric
+    loss_function: SmoothL1Loss
 
 network_config:
-    Network: AttentionNet
+    Network: Transformer
     model_setting:
         block_params: [
                 # out_channels, heads, dim_linear_block, dropout
@@ -38,7 +41,5 @@ network_config:
             [0.1, 4],
         ]
         dim_embedding: 32
-        global_features: 6
-        edge_features: 3
-        input_features: 7
-        output_classes: 2
+        input_features: 5
+        output_classes: 1

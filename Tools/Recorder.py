@@ -78,8 +78,6 @@ class Recorder:
         log.info(f"Mean loss: {cur_loss:.4f}. Metrics: {cur_metric.metrics}")
 
         self.plot_loss()
-        self.plot_score(output, truth_label, weight)
-
         self.cur_epoch += 1
     
     def plot_loss(self):
@@ -95,33 +93,3 @@ class Recorder:
             plot.ax.plot(cur_result.index, cur_result['loss'], linewidth=2, label=f"{btype} loss", marker='o')
         plot.apply_settings(if_legend=True)
         plot.savefig()
-    
-    def plot_score(self, output: torch.Tensor, truth_label: torch.Tensor, weight: torch.Tensor):
-        from scipy.special import softmax
-        from sklearn.metrics import roc_curve
-        output = output.numpy()
-        weight = weight.numpy()
-        truth = truth_label.numpy()
-        score = softmax(output, axis=1)[:,1]
-        signal_mask = (truth==1)
-
-        # Plot scores
-        plot = utils.PlotContainer(xlabel='Score', ylabel='A.U.', figname=f'{self.save_dir}/scores.pdf')
-        bins = 50
-        plot.ax.hist(score[signal_mask], bins=bins, weights=weight[signal_mask], label=rf'Signal', color='red', histtype='step', linewidth=2)
-        plot.ax.hist(score[~signal_mask], bins=bins, weights=weight[~signal_mask], label='Background', color='blue', histtype='step', linewidth=2)
-        plot.apply_settings()
-        plot.ax.legend(loc='upper center')
-        plot.savefig()
-
-        # Plot ROC
-        fpr, tpr, _ = roc_curve(truth, score, sample_weight=weight)
-        roc_auc = np.trapz(tpr, fpr)
-        log.info(f"auc: {roc_auc}.")
-        plot = utils.PlotContainer(xlabel='False Positive Rate', ylabel='True Positive Rate', figname=f'{self.save_dir}/roc.pdf', xlim=[0,1], ylim=[0,1])
-        plot.ax.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.3f)' % roc_auc)
-        plot.ax.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-        plot.ax.legend(loc='lower right')
-        plot.apply_settings()
-        plot.savefig()
-        utils.plt.cla()
