@@ -29,7 +29,8 @@ class Trainer(BaseRunner):
             data_loader = self.dataset.get_dataloader('validation')
             output_save, truth_save, weight_save = self.apply_model(data_loader=data_loader, epoch=epoch, batch_type='validation')
             log.info(f"Complete in {(time.time()-start_time)/60.:.2f} min.")
-            self.end_of_epoch(output=output_save, truth_label=truth_save, weight=weight_save, test_epoch=False)
+            epoch_loss, epoch_metric = self.end_of_epoch(output=output_save, truth_label=truth_save, weight=weight_save, test_epoch=False)
+            self.reduce_schedule.step(epoch_loss)
 
         # Test model 
         # get best epoch

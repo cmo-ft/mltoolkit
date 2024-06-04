@@ -79,6 +79,7 @@ class Recorder:
 
         self.plot_loss()
         self.cur_epoch += 1
+        return cur_loss, cur_metric
     
     def plot_loss(self):
         result = self.record
