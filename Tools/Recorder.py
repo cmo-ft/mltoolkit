@@ -56,6 +56,7 @@ class Recorder:
 
 
     def end_of_epoch(self, output: torch.Tensor, truth_label: torch.Tensor, weight: torch.Tensor, test_epoch=False):
+        print(self.record)
         self.record.to_csv(self.record_path, index=None)
         arr_to_save = torch.cat([output, truth_label.view(len(weight), -1), weight.view(-1,1)], dim=1).numpy()
 
@@ -82,7 +83,8 @@ class Recorder:
         return cur_loss, cur_metric
     
     def plot_loss(self):
-        result = self.record
+        import copy
+        result = copy.copy(self.record)
         batch_types = result['batch_type'].unique()
         result['loss'] = result['loss'] * result['batch_weight']
         plot = utils.PlotContainer(xlabel='Epoch', ylabel='Loss',figname=f'{self.save_dir}/loss_to_epoch.pdf')

@@ -25,7 +25,7 @@ class BaseDataset(ABC):
         if (graph_path is None) or (not os.path.exists(graph_path)):
             self.load_graphs_into_graph_list()
             if graph_path is not None:
-                torch.save(self.graph_list, graph_path)
+                torch.save(torch_geometric.data.Batch.from_data_list(self.graph_list), graph_path)
         else:
             self.graph_list = torch.load(graph_path)
 
