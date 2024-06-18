@@ -75,6 +75,9 @@ class MetricInterface(ABC):
 
         if weight is None:
             weight = torch.ones(len(output))
+        
+        if output.ndim==2 and weight.ndom==1:
+            weight = weight.view(-1, 1)
 
         loss = (self.loss_func(output, truth_label) * weight).sum() / weight.sum()
         metrics = self._metric(output, truth_label, weight)
