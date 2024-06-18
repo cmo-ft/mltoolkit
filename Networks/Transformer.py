@@ -237,7 +237,7 @@ class Transformer(torch.nn.Module):
 
     def forward(self, batch):
         pos = batch.pos if hasattr(batch, 'pos') else batch.node_features
-        edge_index = torch_geometric.nn.knn_graph(batch.pos, 16, batch.batch, loop=True)
+        edge_index = torch_geometric.nn.knn_graph(pos, 16, batch.batch, loop=True)
         node_attr = self.input_embedding(batch.node_features)
 
         for idx, layer in enumerate(self.conv_process):
