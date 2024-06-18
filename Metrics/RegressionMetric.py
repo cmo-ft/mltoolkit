@@ -11,7 +11,7 @@ class RegressionMetric(BaseMetric):
         return ['rel_error']
 
     def compute_metrics(self, output: torch.Tensor, truth_label: torch.Tensor, weight: torch.Tensor)->dict[str, float]:
-        rel_error = -torch.abs(output - truth_label).view(len(output), -1).sum(dim=1) / truth_label.view(len(truth_label), -1).sum(dim=1)
+        rel_error = -torch.abs(output - truth_label).view(len(output), -1).norm(dim=1) / truth_label.view(len(truth_label), -1).norm(dim=1)
         return {'rel_error': rel_error.mean().item()}
 
     def __le__(self, other):
