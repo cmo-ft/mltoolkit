@@ -56,7 +56,7 @@ class Recorder:
 
 
     def end_of_epoch(self, output: torch.Tensor, truth_label: torch.Tensor, weight: torch.Tensor, test_epoch=False):
-        print(self.record)
+        print(self.record.loc[self.record['epoch']==self.cur_epoch])
         self.record.to_csv(self.record_path, index=None)
         arr_to_save = torch.cat([output, truth_label.view(len(weight), -1), weight.view(-1,1)], dim=1).numpy()
 
